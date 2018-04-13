@@ -6,8 +6,7 @@ import RootNavigation from './navigation/RootNavigation';
 
 export default class App extends React.Component {
   state = {
-    isLoadingComplete: false,
-    state2:"kek",
+    isLoadingComplete: false
   };
 
   render() {
