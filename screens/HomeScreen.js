@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  AppRegistry,
   Image,
   Platform,
   ScrollView,
@@ -10,6 +11,9 @@ import {
   View,
 } from 'react-native';
 import { Icon, ListItem, Avatar, SearchBar } from 'react-native-elements'
+import AtoZList from 'react-native-atoz-list';
+import randomcolor from 'randomcolor';
+import _ from 'lodash';
 const list = [
   {
     name: 'Vasya Mrazina',
@@ -21,27 +25,58 @@ const list = [
     avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
     subtitle: 'Dolboeb'
   },
+  {
+    name: 'Mikhail Dicksucker',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Asshole'
+  },
+  {
+    name: 'Alexey Pizdila',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+    subtitle: 'Horse dickhead'
+  },
 ]
+list = _.sortBy(list, 'name');
+list = _.groupBy(list, (item) => item.name[0].toUpperCase());
 export default class HomeScreen extends React.Component {
+
+
+  constructor(props, context) {
+      super(props, context);
+    }
   static navigationOptions = {
     header: null,
   };
-  keyExtractor = (item, index) => index.toString();
+  onTextChange = (text) =>{
+    console.log(text); //TODO write search
+  }
+  onTextClear = () =>{
 
-  renderItem = ({ item }) => (
+  }
+  componentDidMount(){
+    console.log(list);
+  }
+  keyExtractor = (item, index) => index.toString();
+  _renderHeader(data) {
+    return (
+        <View style={{ height: 35, justifyContent: 'center', backgroundColor: '#eee', paddingLeft: 10 }}>
+            <Text>{data.sectionId}</Text>
+        </View>
+    )
+  }
+
+  renderItem = (data) => (
     <ListItem
-      title={item.name}
-      subtitle={item.subtitle}
+      title={data.name}
+      subtitle={data.subtitle}
       avatar={<Avatar
                 small
                 rounded
-                source={{uri: item.avatar_url}}
+                source={{uri: data.avatar_url}}
                 onPress={() => console.log("Avatar Pressed")}
                 activeOpacity={0.7}
               />}
-    />
-
-  )
+    />)
       render() {
         return (
           <View style={styles.container}>
@@ -69,23 +104,30 @@ export default class HomeScreen extends React.Component {
                   />
               </View>
             </View>
-            <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-              <FlatList
-                keyExtractor={this.keyExtractor}
-                data={list}
-                renderItem={this.renderItem}
-              />
-            </ScrollView>
+            <SearchBar
+            lightTheme
+            onChangeText={this.onTextChange}
+            onClearText={this.onTextClear}
+            icon={{ type: 'font-awesome', name: 'search' }}
+            placeholder='Type Here...'
+            />
+            <AtoZList
+              style={styles.content}
+              contentContainerStyle={styles.contentContainer}
+              sectionHeaderHeight={35}
+              cellHeight={95}
+              data={list}
+              renderCell={this.renderItem}
+              renderSection={this._renderHeader}
+            />
           </View>
         );
   }
 
 
 }
-
 const styles = StyleSheet.create({
   content: {
-    paddingTop: 30,
     flex:1,
   },
   container: {
@@ -108,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   title:{
-    textAlign:'center',    
+    textAlign:'center',
     flex:8,
     alignSelf:'center',
     fontSize: 20,
@@ -116,4 +158,34 @@ const styles = StyleSheet.create({
   contentContainer: {
 
   },
+  placeholderCircle: {
+        width: 50,
+        height: 50,
+        backgroundColor: '#ccc',
+        borderRadius: 25,
+        marginRight: 10,
+        marginLeft: 5,
+    },
+    name: {
+        fontSize: 15,
+    },
+    cell: {
+
+        height: 95,
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1,
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      alphabetSidebar: {
+        position: 'absolute',
+        color:"#4244ff",
+        backgroundColor: 'transparent',
+        top: 0,
+        bottom: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
 });
