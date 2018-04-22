@@ -14,6 +14,7 @@ import { Icon, ListItem, Avatar, SearchBar } from 'react-native-elements'
 import AtoZList from 'react-native-atoz-list';
 import randomcolor from 'randomcolor';
 import _ from 'lodash';
+import Swipeout from 'react-native-swipeout';
 const list = [
   {
     name: 'Vasya Mrazina',
@@ -36,37 +37,67 @@ const list = [
     subtitle: 'Horse dickhead'
   },
 ]
-list = _.sortBy(list, 'name');
-list = _.groupBy(list, (item) => item.name[0].toUpperCase());
+
 export default class HomeScreen extends React.Component {
-
-
   constructor(props, context) {
       super(props, context);
+
     }
+  state={
+      data:list,
+      swipeoutBtns:[
+        {
+          text: 'Button'
+        }
+      ],
+  }
   static navigationOptions = {
     header: null,
   };
   onTextChange = (text) =>{
+   let data=_.filter(list, { subtitle: text });
+  /* let test=_.filter(list, function(value, key) {
+    //  return key.startsWith("A");
+    });  //);
+    console.log(test);*/
+    this.setState({data:data});
+    if(text === ""){
+      this.setState({data:list});
+      console.log(this.state.data);
+    }
     console.log(text); //TODO write search
   }
   onTextClear = () =>{
-
+    console.log("clear")
   }
   componentDidMount(){
     console.log(list);
   }
+
+
+
   keyExtractor = (item, index) => index.toString();
   _renderHeader(data) {
     return (
         <View style={{ height: 35, justifyContent: 'center', backgroundColor: '#eee', paddingLeft: 10 }}>
             <Text>{data.sectionId}</Text>
         </View>
-    )
+      )
   }
 
   renderItem = (data) => (
-    <ListItem
+    <Swipeout right={[
+    {
+      text: 'delete',
+      onPress:() => console.log('delete'),
+      style: { backgroundColor: '#ff0000', color: 'white' },
+
+    }
+  ]}
+  onOpen={() => console.log('open')}
+  onClose={() => console.log('close')}
+  >
+    <ListItem //TODO Swipeout
       title={data.name}
       subtitle={data.subtitle}
       avatar={<Avatar
@@ -76,8 +107,14 @@ export default class HomeScreen extends React.Component {
                 onPress={() => console.log("Avatar Pressed")}
                 activeOpacity={0.7}
               />}
-    />)
+    />
+    </Swipeout>
+  )
+
       render() {
+
+        let data = _.sortBy(this.state.data, 'name');
+        data = _.groupBy(this.state.data, (item) => item.name[0].toUpperCase());
         return (
           <View style={styles.container}>
             <View style={styles.topbar}>
@@ -112,11 +149,12 @@ export default class HomeScreen extends React.Component {
             placeholder='Type Here...'
             />
             <AtoZList
+              ref="atozlist"
               style={styles.content}
               contentContainerStyle={styles.contentContainer}
               sectionHeaderHeight={35}
               cellHeight={95}
-              data={list}
+              data={data}
               renderCell={this.renderItem}
               renderSection={this._renderHeader}
             />
